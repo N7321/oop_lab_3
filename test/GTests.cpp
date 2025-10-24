@@ -2,182 +2,182 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
-// Тесты для Figure (базовый класс).
-TEST(FigureTest, GeometricCenter) {
-    Pentagon p(1, 2, 5);
-    auto center = p.geometricCenter();
+// Тесты для базового класса Figure
+TEST(FigureTest, GeometricCenterCalculation) {
+    Pentagon pentagon(1, 2, 5);
+    auto center = pentagon.getGeometricCenter();
     EXPECT_DOUBLE_EQ(center.first, 1.0);
     EXPECT_DOUBLE_EQ(center.second, 2.0);
 }
 
-TEST(FigureTest, AreaCalculation) {
-    Hexagon h(0, 0, 1);
-    double area = h.area();
-    EXPECT_GT(area, 0).  // Площадь должна быть положительной.
+TEST(FigureTest, AreaComputation) {
+    Hexagon hexagon(0, 0, 1);
+    double computedArea = hexagon.calculateArea();
+    EXPECT_GT(computedArea, 0);  // Площадь всегда должна быть положительной
     
-    // Для шестиугольника с радиусом 1 площадь ≈ 2.598.
-    EXPECT_NEAR(area, 2.598, 0.1);
+    // Для шестиугольника с радиусом 1 площадь ≈ 2.598
+    EXPECT_NEAR(computedArea, 2.598, 0.1);
 }
 
-TEST(FigureTest, DoubleConversion) {
-    Octagon o(0, 0, 2);
-    double area = static_cast<double>(o);
-    EXPECT_GT(area, 0);
+TEST(FigureTest, DoubleConversionOperator) {
+    Octagon octagon(0, 0, 2);
+    double areaValue = static_cast<double>(octagon);
+    EXPECT_GT(areaValue, 0);
 }
 
-// Тесты для Pentagon.
-TEST(PentagonTest, CreationAndCopy) {
-    Pentagon p1(1, 1, 3);
-    Pentagon p2 = p1;  // Copy конструктор.
+// Тесты для класса Pentagon
+TEST(PentagonTest, ObjectCreationAndCopy) {
+    Pentagon firstPentagon(1, 1, 3);
+    Pentagon secondPentagon = firstPentagon;  // Конструктор копирования
     
-    EXPECT_TRUE(p1 == p2);
+    EXPECT_TRUE(firstPentagon.isEqual(secondPentagon));
 }
 
-TEST(PentagonTest, Clone) {
-    Pentagon p(2, 3, 4);
-    Figure* clone = p.clone();
+TEST(PentagonTest, CopyCreationMethod) {
+    Pentagon originalPentagon(2, 3, 4);
+    Figure* copiedFigure = originalPentagon.createCopy();
     
-    EXPECT_TRUE(p == *clone);
-    EXPECT_NE(&p, clone);  // Должен быть другой объект.
+    EXPECT_TRUE(originalPentagon.isEqual(*copiedFigure));
+    EXPECT_NE(&originalPentagon, copiedFigure);  // Должен быть создан новый объект
     
-    delete clone;
+    delete copiedFigure;
 }
 
-// Тесты для Hexagon.
-TEST(HexagonTest, Area) {
-    Hexagon h(0, 0, 1);
-    double area = h.area();
-    // Площадь правильного шестиугольника: (3√3 * r²)/2.
-    double expected = (3 * std::sqrt(3) * 1 * 1) / 2;
-    EXPECT_NEAR(area, expected, 0.001);
+// Тесты для класса Hexagon
+TEST(HexagonTest, AreaCalculationAccuracy) {
+    Hexagon hexagon(0, 0, 1);
+    double computedArea = hexagon.calculateArea();
+    // Площадь правильного шестиугольника: (3√3 * r²)/2
+    double expectedArea = (3 * std::sqrt(3) * 1 * 1) / 2;
+    EXPECT_NEAR(computedArea, expectedArea, 0.001);
 }
 
-TEST(HexagonTest, MoveSemantics) {
-    Hexagon h1(1, 2, 3);
-    Hexagon h2 = std::move(h1);  // Move конструктор.
+TEST(HexagonTest, MoveOperations) {
+    Hexagon firstHexagon(1, 2, 3);
+    Hexagon secondHexagon = std::move(firstHexagon);  // Конструктор перемещения
     
-    // После move h1 может быть в валидном, но unspecified состоянии.
-    // Но h2 должен работать корректно.
-    EXPECT_GT(h2.area(), 0);
+    // После перемещения firstHexagon может быть в валидном, но неопределенном состоянии
+    // Но secondHexagon должен работать корректно
+    EXPECT_GT(secondHexagon.calculateArea(), 0);
 }
 
-// Тесты для Octagon.
-TEST(OctagonTest, VerticesCount) {
-    Octagon o(0, 0, 5);
-    auto center = o.geometricCenter();
-    EXPECT_DOUBLE_EQ(center.first, 0.0);
-    EXPECT_DOUBLE_EQ(center.second, 0.0);
+// Тесты для класса Octagon
+TEST(OctagonTest, CenterCoordinates) {
+    Octagon octagon(0, 0, 5);
+    auto centerPoint = octagon.getGeometricCenter();
+    EXPECT_DOUBLE_EQ(centerPoint.first, 0.0);
+    EXPECT_DOUBLE_EQ(centerPoint.second, 0.0);
 }
 
-TEST(OctagonTest, Comparison) {
-    Octagon o1(1, 1, 2);
-    Octagon o2(1, 1, 2);
-    Octagon o3(2, 2, 3);
+TEST(OctagonTest, ObjectComparison) {
+    Octagon firstOctagon(1, 1, 2);
+    Octagon secondOctagon(1, 1, 2);
+    Octagon thirdOctagon(2, 2, 3);
     
-    EXPECT_TRUE(o1 == o2);
-    EXPECT_FALSE(o1 == o3);
+    EXPECT_TRUE(firstOctagon.isEqual(secondOctagon));
+    EXPECT_FALSE(firstOctagon.isEqual(thirdOctagon));
 }
 
-// Тесты для FigureArray.
-TEST(FigureArrayTest, AddAndRemove) {
-    FigureArray array;
+// Тесты для класса FigureCollection
+TEST(FigureCollectionTest, AddAndRemoveOperations) {
+    FigureCollection collection;
     
-    EXPECT_EQ(array.size(), 0);
+    EXPECT_EQ(collection.getCount(), 0);
     
-    array.addFigure(new Pentagon(0, 0, 1));
-    array.addFigure(new Hexagon(1, 1, 2));
+    collection.addFigure(new Pentagon(0, 0, 1));
+    collection.addFigure(new Hexagon(1, 1, 2));
     
-    EXPECT_EQ(array.size(), 2);
+    EXPECT_EQ(collection.getCount(), 2);
     
-    array.removeFigure(0);
-    EXPECT_EQ(array.size(), 1);
+    collection.removeFigureAt(0);
+    EXPECT_EQ(collection.getCount(), 1);
 }
 
-TEST(FigureArrayTest, TotalArea) {
-    FigureArray array;
+TEST(FigureCollectionTest, TotalAreaComputation) {
+    FigureCollection collection;
     
-    array.addFigure(new Pentagon(0, 0, 1));
-    array.addFigure(new Hexagon(0, 0, 1));
+    collection.addFigure(new Pentagon(0, 0, 1));
+    collection.addFigure(new Hexagon(0, 0, 1));
     
-    double total = array.totalArea();
-    EXPECT_GT(total, 0);
+    double totalArea = collection.computeTotalArea();
+    EXPECT_GT(totalArea, 0);
     
-    // Общая площадь должна быть суммой площадей.
-    double pentagonArea = array[0]->area();
-    double hexagonArea = array[1]->area();
-    EXPECT_DOUBLE_EQ(total, pentagonArea + hexagonArea);
+    // Общая площадь должна быть суммой площадей отдельных фигур
+    double pentagonArea = collection.getFigureAt(0)->calculateArea();
+    double hexagonArea = collection.getFigureAt(1)->calculateArea();
+    EXPECT_DOUBLE_EQ(totalArea, pentagonArea + hexagonArea);
 }
 
-TEST(FigureArrayTest, CopyConstructor) {
-    FigureArray array1;
-    array1.addFigure(new Pentagon(1, 1, 2));
-    array1.addFigure(new Hexagon(2, 2, 3));
+TEST(FigureCollectionTest, CopyConstructorBehavior) {
+    FigureCollection firstCollection;
+    firstCollection.addFigure(new Pentagon(1, 1, 2));
+    firstCollection.addFigure(new Hexagon(2, 2, 3));
     
-    FigureArray array2 = array1;  // Copy конструктор.
+    FigureCollection secondCollection = firstCollection;  // Конструктор копирования
     
-    EXPECT_EQ(array1.size(), array2.size());
-    EXPECT_NE(array1[0], array2[0]);  // Должны быть разные указатели.
-    EXPECT_TRUE(*array1[0] == *array2[0]);  // Но объекты одинаковые.
+    EXPECT_EQ(firstCollection.getCount(), secondCollection.getCount());
+    EXPECT_NE(firstCollection.getFigureAt(0), secondCollection.getFigureAt(0));  // Должны быть разные указатели
+    EXPECT_TRUE(*firstCollection.getFigureAt(0)->isEqual(*secondCollection.getFigureAt(0)));  // Но объекты одинаковые
 }
 
-TEST(FigureArrayTest, MoveConstructor) {
-    FigureArray array1;
-    array1.addFigure(new Octagon(0, 0, 5));
+TEST(FigureCollectionTest, MoveConstructorBehavior) {
+    FigureCollection firstCollection;
+    firstCollection.addFigure(new Octagon(0, 0, 5));
     
-    size_t originalSize = array1.size();
-    FigureArray array2 = std::move(array1);  // Move конструктор.
+    size_t originalSize = firstCollection.getCount();
+    FigureCollection secondCollection = std::move(firstCollection);  // Конструктор перемещения
     
-    EXPECT_EQ(array2.size(), originalSize);
-    EXPECT_EQ(array1.size(), 0);  // array1 должен быть пустым.
+    EXPECT_EQ(secondCollection.getCount(), originalSize);
+    EXPECT_EQ(firstCollection.getCount(), 0);  // firstCollection должен быть пустым
 }
 
-TEST(FigureArrayTest, CopyAssignment) {
-    FigureArray array1;
-    array1.addFigure(new Pentagon(1, 2, 3));
+TEST(FigureCollectionTest, CopyAssignmentOperation) {
+    FigureCollection firstCollection;
+    firstCollection.addFigure(new Pentagon(1, 2, 3));
     
-    FigureArray array2;
-    array2 = array1;  // Copy присваивание.
+    FigureCollection secondCollection;
+    secondCollection = firstCollection;  // Оператор присваивания копированием
     
-    EXPECT_EQ(array1.size(), array2.size());
-    EXPECT_TRUE(*array1[0] == *array2[0]);
+    EXPECT_EQ(firstCollection.getCount(), secondCollection.getCount());
+    EXPECT_TRUE(*firstCollection.getFigureAt(0)->isEqual(*secondCollection.getFigureAt(0)));
 }
 
-TEST(FigureArrayTest, SelfAssignment) {
-    FigureArray array;
-    array.addFigure(new Hexagon(0, 0, 1));
+TEST(FigureCollectionTest, SelfAssignmentHandling) {
+    FigureCollection collection;
+    collection.addFigure(new Hexagon(0, 0, 1));
     
-    array = array;  // Self-assignment.
+    collection = collection;  // Самоприсваивание
     
-    EXPECT_EQ(array.size(), 1);  // Должен остаться валидным.
+    EXPECT_EQ(collection.getCount(), 1);  // Коллекция должна остаться валидной
 }
 
-TEST(FigureArrayTest, PrintMethods) {
-    FigureArray array;
-    array.addFigure(new Pentagon(0, 0, 1));
+TEST(FigureCollectionTest, DisplayMethodsExecution) {
+    FigureCollection collection;
+    collection.addFigure(new Pentagon(0, 0, 1));
     
-    // Тестируем что методы не падают.
+    // Проверяем что методы вывода не вызывают ошибок
     testing::internal::CaptureStdout();
-    array.printAll();
+    collection.displayAllFigures();
     std::string output = testing::internal::GetCapturedStdout();
     EXPECT_FALSE(output.empty());
     
     testing::internal::CaptureStdout();
-    array.printAllCenters();
+    collection.displayAllCenters();
     output = testing::internal::GetCapturedStdout();
     EXPECT_FALSE(output.empty());
     
     testing::internal::CaptureStdout();
-    array.printAllAreas();
+    collection.displayAllAreas();
     output = testing::internal::GetCapturedStdout();
     EXPECT_FALSE(output.empty());
 }
 
-// Тесты для потокового ввода/вывода.
-TEST(IOStreamTest, OutputOperator) {
-    Pentagon p(1, 2, 3);
+// Тесты для операций ввода/вывода
+TEST(IOStreamTest, OutputOperatorFunctionality) {
+    Pentagon pentagon(1, 2, 3);
     
     testing::internal::CaptureStdout();
-    std::cout << p;
+    std::cout << pentagon;
     std::string output = testing::internal::GetCapturedStdout();
     
     EXPECT_TRUE(output.find("Вершины 5-угольника") != std::string::npos);
@@ -185,50 +185,50 @@ TEST(IOStreamTest, OutputOperator) {
     EXPECT_TRUE(output.find("Площадь") != std::string::npos);
 }
 
-TEST(IOStreamTest, InputOperator) {
-    std::istringstream input("1.5 2.5 3.5");
-    Pentagon p;
+TEST(IOStreamTest, InputOperatorFunctionality) {
+    std::istringstream inputStream("1.5 2.5 3.5");
+    Pentagon pentagon;
     
-    input >> p;
+    inputStream >> pentagon;
     
-    auto center = p.geometricCenter();
+    auto center = pentagon.getGeometricCenter();
     EXPECT_DOUBLE_EQ(center.first, 1.5);
     EXPECT_DOUBLE_EQ(center.second, 2.5);
 }
 
-// Тест на смешанные фигуры в массиве.
-TEST(MixedFiguresTest, DifferentTypesInArray) {
-    FigureArray array;
+// Тест с различными типами фигур в коллекции
+TEST(MixedFiguresTest, HandlingDifferentFigureTypes) {
+    FigureCollection collection;
     
-    array.addFigure(new Pentagon(0, 0, 1));
-    array.addFigure(new Hexagon(0, 0, 1));
-    array.addFigure(new Octagon(0, 0, 1));
+    collection.addFigure(new Pentagon(0, 0, 1));
+    collection.addFigure(new Hexagon(0, 0, 1));
+    collection.addFigure(new Octagon(0, 0, 1));
     
-    EXPECT_EQ(array.size(), 3);
+    EXPECT_EQ(collection.getCount(), 3);
     
-    // Все фигуры должны иметь положительную площадь.
-    for (size_t i = 0; i < array.size(); ++i) {
-        EXPECT_GT(array[i]->area(), 0);
+    // Все фигуры должны иметь положительную площадь
+    for (size_t i = 0; i < collection.getCount(); ++i) {
+        EXPECT_GT(collection.getFigureAt(i)->calculateArea(), 0);
     }
     
-    // Общая площадь должна быть корректной.
-    double total = array.totalArea();
-    EXPECT_GT(total, 0);
+    // Общая площадь должна быть корректно вычислена
+    double totalArea = collection.computeTotalArea();
+    EXPECT_GT(totalArea, 0);
 }
 
-// Тест на удаление по невалидному индексу.
-TEST(FigureArrayTest, RemoveInvalidIndex) {
-    FigureArray array;
-    array.addFigure(new Pentagon(0, 0, 1));
+// Тест обработки невалидных индексов
+TEST(FigureCollectionTest, InvalidIndexRemoval) {
+    FigureCollection collection;
+    collection.addFigure(new Pentagon(0, 0, 1));
     
-    // Не должно падать при невалидном индексе.
-    array.removeFigure(-1);
-    array.removeFigure(10);
+    // Не должно возникать ошибок при невалидных индексах
+    collection.removeFigureAt(-1);
+    collection.removeFigureAt(10);
     
-    EXPECT_EQ(array.size(), 1);  // Размер не должен измениться.
+    EXPECT_EQ(collection.getCount(), 1);  // Размер коллекции не должен измениться
 }
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
-}.
+}
