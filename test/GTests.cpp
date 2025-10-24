@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 #include <sstream>
 
-// Тесты для базового класса Figure
+
 TEST(FigureTest, GeometricCenterCalculation) {
     Pentagon pentagon(1, 2, 5);
     auto center = pentagon.getGeometricCenter();
@@ -13,9 +13,9 @@ TEST(FigureTest, GeometricCenterCalculation) {
 TEST(FigureTest, AreaComputation) {
     Hexagon hexagon(0, 0, 1);
     double computedArea = hexagon.calculateArea();
-    EXPECT_GT(computedArea, 0);  // Площадь всегда должна быть положительной
+    EXPECT_GT(computedArea, 0); 
     
-    // Для шестиугольника с радиусом 1 площадь ≈ 2.598
+
     EXPECT_NEAR(computedArea, 2.598, 0.1);
 }
 
@@ -28,40 +28,36 @@ TEST(FigureTest, DoubleConversionOperator) {
 // Тесты для класса Pentagon
 TEST(PentagonTest, ObjectCreationAndCopy) {
     Pentagon firstPentagon(1, 1, 3);
-    Pentagon secondPentagon = firstPentagon;  // Конструктор копирования
+    Pentagon secondPentagon = firstPentagon;
     
     EXPECT_TRUE(firstPentagon.isEqual(secondPentagon));
 }
-
 TEST(PentagonTest, CopyCreationMethod) {
     Pentagon originalPentagon(2, 3, 4);
     Figure* copiedFigure = originalPentagon.createCopy();
     
     EXPECT_TRUE(originalPentagon.isEqual(*copiedFigure));
-    EXPECT_NE(&originalPentagon, copiedFigure);  // Должен быть создан новый объект
+    EXPECT_NE(&originalPentagon, copiedFigure);
     
     delete copiedFigure;
 }
-
 // Тесты для класса Hexagon
 TEST(HexagonTest, AreaCalculationAccuracy) {
     Hexagon hexagon(0, 0, 1);
     double computedArea = hexagon.calculateArea();
-    // Площадь правильного шестиугольника: (3√3 * r²)/2
     double expectedArea = (3 * std::sqrt(3) * 1 * 1) / 2;
     EXPECT_NEAR(computedArea, expectedArea, 0.001);
 }
 
 TEST(HexagonTest, MoveOperations) {
     Hexagon firstHexagon(1, 2, 3);
-    Hexagon secondHexagon = std::move(firstHexagon);  // Конструктор перемещения
+    Hexagon secondHexagon = std::move(firstHexagon); 
     
-    // После перемещения firstHexagon может быть в валидном, но неопределенном состоянии
-    // Но secondHexagon должен работать корректно
+   
     EXPECT_GT(secondHexagon.calculateArea(), 0);
 }
 
-// Тесты для класса Octagon
+
 TEST(OctagonTest, CenterCoordinates) {
     Octagon octagon(0, 0, 5);
     auto centerPoint = octagon.getGeometricCenter();
@@ -78,7 +74,7 @@ TEST(OctagonTest, ObjectComparison) {
     EXPECT_FALSE(firstOctagon.isEqual(thirdOctagon));
 }
 
-// Тесты для класса FigureCollection
+
 TEST(FigureCollectionTest, AddAndRemoveOperations) {
     FigureCollection collection;
     
@@ -102,7 +98,7 @@ TEST(FigureCollectionTest, TotalAreaComputation) {
     double totalArea = collection.computeTotalArea();
     EXPECT_GT(totalArea, 0);
     
-    // Общая площадь должна быть суммой площадей отдельных фигур
+
     double pentagonArea = collection.getFigureAt(0)->calculateArea();
     double hexagonArea = collection.getFigureAt(1)->calculateArea();
     EXPECT_DOUBLE_EQ(totalArea, pentagonArea + hexagonArea);
@@ -113,11 +109,10 @@ TEST(FigureCollectionTest, CopyConstructorBehavior) {
     firstCollection.addFigure(new Pentagon(1, 1, 2));
     firstCollection.addFigure(new Hexagon(2, 2, 3));
     
-    FigureCollection secondCollection = firstCollection;  // Конструктор копирования
-    
+    FigureCollection secondCollection = firstCollection;
     EXPECT_EQ(firstCollection.getCount(), secondCollection.getCount());
-    EXPECT_NE(firstCollection.getFigureAt(0), secondCollection.getFigureAt(0));  // Должны быть разные указатели
-    EXPECT_TRUE(*firstCollection.getFigureAt(0)->isEqual(*secondCollection.getFigureAt(0)));  // Но объекты одинаковые
+    EXPECT_NE(firstCollection.getFigureAt(0), secondCollection.getFigureAt(0));
+    EXPECT_TRUE(*firstCollection.getFigureAt(0)->isEqual(*secondCollection.getFigureAt(0))); 
 }
 
 TEST(FigureCollectionTest, MoveConstructorBehavior) {
@@ -125,10 +120,9 @@ TEST(FigureCollectionTest, MoveConstructorBehavior) {
     firstCollection.addFigure(new Octagon(0, 0, 5));
     
     size_t originalSize = firstCollection.getCount();
-    FigureCollection secondCollection = std::move(firstCollection);  // Конструктор перемещения
-    
+    FigureCollection secondCollection = std::move(firstCollection);  
     EXPECT_EQ(secondCollection.getCount(), originalSize);
-    EXPECT_EQ(firstCollection.getCount(), 0);  // firstCollection должен быть пустым
+    EXPECT_EQ(firstCollection.getCount(), 0); 
 }
 
 TEST(FigureCollectionTest, CopyAssignmentOperation) {
@@ -136,7 +130,7 @@ TEST(FigureCollectionTest, CopyAssignmentOperation) {
     firstCollection.addFigure(new Pentagon(1, 2, 3));
     
     FigureCollection secondCollection;
-    secondCollection = firstCollection;  // Оператор присваивания копированием
+    secondCollection = firstCollection;
     
     EXPECT_EQ(firstCollection.getCount(), secondCollection.getCount());
     EXPECT_TRUE(*firstCollection.getFigureAt(0)->isEqual(*secondCollection.getFigureAt(0)));
@@ -146,16 +140,14 @@ TEST(FigureCollectionTest, SelfAssignmentHandling) {
     FigureCollection collection;
     collection.addFigure(new Hexagon(0, 0, 1));
     
-    collection = collection;  // Самоприсваивание
+    collection = collection;
     
-    EXPECT_EQ(collection.getCount(), 1);  // Коллекция должна остаться валидной
+    EXPECT_EQ(collection.getCount(), 1); 
 }
 
 TEST(FigureCollectionTest, DisplayMethodsExecution) {
     FigureCollection collection;
     collection.addFigure(new Pentagon(0, 0, 1));
-    
-    // Проверяем что методы вывода не вызывают ошибок
     testing::internal::CaptureStdout();
     collection.displayAllFigures();
     std::string output = testing::internal::GetCapturedStdout();
@@ -172,7 +164,7 @@ TEST(FigureCollectionTest, DisplayMethodsExecution) {
     EXPECT_FALSE(output.empty());
 }
 
-// Тесты для операций ввода/вывода
+
 TEST(IOStreamTest, OutputOperatorFunctionality) {
     Pentagon pentagon(1, 2, 3);
     
@@ -196,7 +188,7 @@ TEST(IOStreamTest, InputOperatorFunctionality) {
     EXPECT_DOUBLE_EQ(center.second, 2.5);
 }
 
-// Тест с различными типами фигур в коллекции
+
 TEST(MixedFiguresTest, HandlingDifferentFigureTypes) {
     FigureCollection collection;
     
@@ -205,27 +197,24 @@ TEST(MixedFiguresTest, HandlingDifferentFigureTypes) {
     collection.addFigure(new Octagon(0, 0, 1));
     
     EXPECT_EQ(collection.getCount(), 3);
-    
-    // Все фигуры должны иметь положительную площадь
     for (size_t i = 0; i < collection.getCount(); ++i) {
         EXPECT_GT(collection.getFigureAt(i)->calculateArea(), 0);
     }
     
-    // Общая площадь должна быть корректно вычислена
     double totalArea = collection.computeTotalArea();
     EXPECT_GT(totalArea, 0);
 }
 
-// Тест обработки невалидных индексов
+
 TEST(FigureCollectionTest, InvalidIndexRemoval) {
     FigureCollection collection;
     collection.addFigure(new Pentagon(0, 0, 1));
     
-    // Не должно возникать ошибок при невалидных индексах
+
     collection.removeFigureAt(-1);
     collection.removeFigureAt(10);
     
-    EXPECT_EQ(collection.getCount(), 1);  // Размер коллекции не должен измениться
+    EXPECT_EQ(collection.getCount(), 1);
 }
 
 int main(int argc, char **argv) {

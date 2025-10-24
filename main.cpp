@@ -24,17 +24,17 @@ int main() {
         cin >> userChoice;
 
         if (userChoice == 0) {
-            cout << "Работа программы завершена." << endl;
+            cout << "Работа программы завершена" << endl;
             break;
         }
 
         switch (userChoice) {
             case 1: {
                 double centerX, centerY, radiusValue;
-                cout << "Введите координаты центра (x y) и радиус: ";
+                cout << "Введите координаты центра x y и радиус: ";
                 cin >> centerX >> centerY >> radiusValue;
                 figureCollection.addFigure(new Pentagon(centerX, centerY, radiusValue));
-                cout << "Пятиугольник успешно добавлен в коллекцию!" << endl;
+                cout << "Пятиугольник теперь в коллекции" << endl;
                 break;
             }
             case 2: {
@@ -42,7 +42,7 @@ int main() {
                 cout << "Введите координаты центра (x y) и радиус: ";
                 cin >> centerX >> centerY >> radiusValue;
                 figureCollection.addFigure(new Hexagon(centerX, centerY, radiusValue));
-                cout << "Шестиугольник успешно добавлен в коллекцию!" << endl;
+                cout << "Шестиугольник теперь в коллекции" << endl;
                 break;
             }
             case 3: {
@@ -50,7 +50,7 @@ int main() {
                 cout << "Введите координаты центра (x y) и радиус: ";
                 cin >> centerX >> centerY >> radiusValue;
                 figureCollection.addFigure(new Octagon(centerX, centerY, radiusValue));
-                cout << "Восьмиугольник успешно добавлен в коллекцию!" << endl;
+                cout << "Восьмиугольник теперь в коллекции" << endl;
                 break;
             }
             case 4:
