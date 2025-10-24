@@ -4,85 +4,67 @@
 using namespace std;
 
 int main() {
-    FigureCollection figureCollection;
-    int userChoice;
+    FigureList list;
+    int cmd;
 
-    cout << "=== Программа для работы с геометрическими фигурами ===" << endl;
+    cout << "=== Работа с фигурами ===" << endl;
 
     while (true) {
-        cout << "\nОсновное меню:" << endl;
+        cout << "\nМеню:" << endl;
         cout << "1. Добавить пятиугольник" << endl;
         cout << "2. Добавить шестиугольник" << endl;
         cout << "3. Добавить восьмиугольник" << endl;
-        cout << "4. Показать информацию о всех фигурах" << endl;
-        cout << "5. Показать геометрические центры" << endl;
-        cout << "6. Показать площади всех фигур" << endl;
-        cout << "7. Показать общую площадь" << endl;
-        cout << "8. Удалить фигуру по индексу" << endl;
-        cout << "0. Завершить программу" << endl;
-        cout << "Введите номер действия: ";
-        cin >> userChoice;
+        cout << "4. Показать все" << endl;
+        cout << "5. Показать центры" << endl;
+        cout << "6. Показать площади" << endl;
+        cout << "7. Общая площадь" << endl;
+        cout << "8. Удалить фигуру" << endl;
+        cout << "0. Выход" << endl;
+        cout << "Выбор: ";
+        cin >> cmd;
 
-        if (userChoice == 0) {
-            cout << "Работа программы завершена" << endl;
+        if (cmd == 0) {
+            cout << "Выход" << endl;
             break;
         }
 
-        switch (userChoice) {
-            case 1: {
-                double centerX, centerY, radiusValue;
-                cout << "Введите координаты центра x y и радиус: ";
-                cin >> centerX >> centerY >> radiusValue;
-                figureCollection.addFigure(new Pentagon(centerX, centerY, radiusValue));
-                cout << "Пятиугольник теперь в коллекции" << endl;
-                break;
-            }
-            case 2: {
-                double centerX, centerY, radiusValue;
-                cout << "Введите координаты центра (x y) и радиус: ";
-                cin >> centerX >> centerY >> radiusValue;
-                figureCollection.addFigure(new Hexagon(centerX, centerY, radiusValue));
-                cout << "Шестиугольник теперь в коллекции" << endl;
-                break;
-            }
-            case 3: {
-                double centerX, centerY, radiusValue;
-                cout << "Введите координаты центра (x y) и радиус: ";
-                cin >> centerX >> centerY >> radiusValue;
-                figureCollection.addFigure(new Octagon(centerX, centerY, radiusValue));
-                cout << "Восьмиугольник теперь в коллекции" << endl;
-                break;
-            }
-            case 4:
-                cout << "\nИнформация о всех фигурах в коллекции:" << endl;
-                figureCollection.displayAllFigures();
-                break;
-            case 5:
-                cout << "\nГеометрические центры фигур:" << endl;
-                figureCollection.displayAllCenters();
-                break;
-            case 6:
-                cout << "\nПлощади всех фигур:" << endl;
-                figureCollection.displayAllAreas();
-                break;
-            case 7:
-                cout << "\nОбщая площадь всех фигур: " << figureCollection.computeTotalArea() << endl;
-                break;
-            case 8: {
-                int indexToRemove;
-                cout << "Введите индекс фигуры для удаления (1-" << figureCollection.getCount() << "): ";
-                cin >> indexToRemove;
-                if (indexToRemove >= 1 && indexToRemove <= static_cast<int>(figureCollection.getCount())) {
-                    figureCollection.removeFigureAt(indexToRemove - 1);
-                    cout << "Фигура успешно удалена!" << endl;
-                } else {
-                    cout << "Ошибка: неверный индекс!" << endl;
-                }
-                break;
-            }
-            default:
-                cout << "Ошибка: неверный номер действия!" << endl;
-                break;
+        if (cmd == 1) {
+            double a, b, c;
+            cout << "Введите x y r: ";
+            cin >> a >> b >> c;
+            list.add(new Pentagon(a, b, c));
+            cout << "Добавлен" << endl;
+        } else if (cmd == 2) {
+            double a, b, c;
+            cout << "Введите x y r: ";
+            cin >> a >> b >> c;
+            list.add(new Hexagon(a, b, c));
+            cout << "Добавлен" << endl;
+        } else if (cmd == 3) {
+            double a, b, c;
+            cout << "Введите x y r: ";
+            cin >> a >> b >> c;
+            list.add(new Octagon(a, b, c));
+            cout << "Добавлен" << endl;
+        } else if (cmd == 4) {
+            cout << "\nВсе фигуры:" << endl;
+            list.showAll();
+        } else if (cmd == 5) {
+            cout << "\nЦентры:" << endl;
+            list.showCenters();
+        } else if (cmd == 6) {
+            cout << "\nПлощади:" << endl;
+            list.showSquares();
+        } else if (cmd == 7) {
+            cout << "\nОбщая площадь: " << list.allSquare() << endl;
+        } else if (cmd == 8) {
+            int idx;
+            cout << "Номер для удаления (1-" << list.count() << "): ";
+            cin >> idx;
+            list.remove(idx - 1);
+            cout << "Удален" << endl;
+        } else {
+            cout << "Нет такого" << endl;
         }
     }
 

@@ -7,82 +7,73 @@
 
 class Figure {
 protected:
-    double centerX, centerY;  
-    double circumradius;       
-    int vertexCount;           
+    double x, y;
+    double r;
+    int n;
 
 public:
-    Figure(double x = 0, double y = 0, double radius = 1, int vertices = 5);
-    
+    Figure(double x = 0, double y = 0, double r = 1, int n = 5);
     Figure(const Figure& other);
     virtual ~Figure() = default;
 
-
-    virtual std::pair<double, double> getGeometricCenter() const;
-    virtual double calculateArea() const;
-    virtual void outputVertices(std::ostream& os) const;
-    virtual void inputData(std::istream& is);
-    
-
+    virtual std::pair<double, double> center() const;
+    virtual double square() const;
+    virtual void showPoints(std::ostream& os) const;
+    virtual void read(std::istream& is);
     virtual operator double() const;
     
-
-    virtual Figure* createCopy() const = 0;
-    virtual bool isEqual(const Figure& other) const;
-
+    virtual Figure* copy() const = 0;
+    virtual bool same(const Figure& other) const;
 
     Figure& operator=(const Figure& other);
     Figure& operator=(Figure&& other) noexcept;
-
 
     friend std::ostream& operator<<(std::ostream& os, const Figure& fig);
     friend std::istream& operator>>(std::istream& is, Figure& fig);
 };
 
-
 class Pentagon : public Figure {
 public:
-    Pentagon(double x = 0, double y = 0, double radius = 1);
+    Pentagon(double x = 0, double y = 0, double r = 1);
     Pentagon(const Pentagon& other);
-    Figure* createCopy() const override;
+    Figure* copy() const override;
 };
-
 
 class Hexagon : public Figure {
 public:
-    Hexagon(double x = 0, double y = 0, double radius = 1);
+    Hexagon(double x = 0, double y = 0, double r = 1);
     Hexagon(const Hexagon& other);
-    Figure* createCopy() const override;
+    Figure* copy() const override;
 };
-
 
 class Octagon : public Figure {
 public:
-    Octagon(double x = 0, double y = 0, double radius = 1);
+    Octagon(double x = 0, double y = 0, double r = 1);
     Octagon(const Octagon& other);
-    Figure* createCopy() const override;
+    Figure* copy() const override;
 };
 
-
-class FigureCollection {
+class FigureList {
 private:
-    std::vector<Figure*> figuresList;
+    std::vector<Figure*> items;
 
 public:
-    FigureCollection() = default;
-    FigureCollection(const FigureCollection& other);
-    FigureCollection(FigureCollection&& other) noexcept;
-    ~FigureCollection();
-    FigureCollection& operator=(const FigureCollection& other);
-    FigureCollection& operator=(FigureCollection&& other) noexcept;
-    void addFigure(Figure* newFigure);
-    void removeFigureAt(int index);
-    void displayAllFigures() const;
-    double computeTotalArea() const;
-    void displayAllCenters() const;
-    void displayAllAreas() const;
-    size_t getCount() const;
-    Figure* getFigureAt(size_t index) const;
+    FigureList() = default;
+    FigureList(const FigureList& other);
+    FigureList(FigureList&& other) noexcept;
+    ~FigureList();
+    
+    FigureList& operator=(const FigureList& other);
+    FigureList& operator=(FigureList&& other) noexcept;
+
+    void add(Figure* fig);
+    void remove(int i);
+    void showAll() const;
+    double allSquare() const;
+    void showCenters() const;
+    void showSquares() const;
+    size_t count() const;
+    Figure* get(size_t i) const;
 };
 
 #endif

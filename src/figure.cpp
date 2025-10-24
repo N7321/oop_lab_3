@@ -1,212 +1,197 @@
 #include "../include/figure.h"
 #include <utility>
 
-
-Figure::Figure(double x, double y, double radius, int vertices)
-    : centerX(x), centerY(y), circumradius(radius), vertexCount(vertices) {}
+Figure::Figure(double x, double y, double r, int n)
+    : x(x), y(y), r(r), n(n) {}
 
 Figure::Figure(const Figure& other)
-    : centerX(other.centerX), centerY(other.centerY), 
-      circumradius(other.circumradius), vertexCount(other.vertexCount) {}
+    : x(other.x), y(other.y), r(other.r), n(other.n) {}
 
-std::pair<double, double> Figure::getGeometricCenter() const {
-    return {centerX, centerY};
+std::pair<double, double> Figure::center() const {
+    return {x, y};
 }
 
-double Figure::calculateArea() const {
-    double angleStep = 2 * M_PI / vertexCount;
-    return 0.5 * vertexCount * circumradius * circumradius * sin(angleStep);
+double Figure::square() const {
+    double a = 2 * M_PI / n;
+    return 0.5 * n * r * r * sin(a);
 }
 
-void Figure::outputVertices(std::ostream& os) const {
-    double angleStep = 2 * M_PI / vertexCount;
-    os << "Вершины " << vertexCount << "-угольника: ";
-    for (int i = 0; i < vertexCount; ++i) {
-        double currentAngle = i * angleStep;
-        double vertexX = centerX + circumradius * cos(currentAngle);
-        double vertexY = centerY + circumradius * sin(currentAngle);
-        os << "(" << vertexX << ", " << vertexY << ") ";
+void Figure::showPoints(std::ostream& os) const {
+    double a = 2 * M_PI / n;
+    os << "Точки " << n << "-угольника: ";
+    for (int i = 0; i < n; ++i) {
+        double ca = i * a;
+        double px = x + r * cos(ca);
+        double py = y + r * sin(ca);
+        os << "(" << px << ", " << py << ") ";
     }
     os << std::endl;
 }
 
-void Figure::inputData(std::istream& is) {
-    is >> centerX >> centerY >> circumradius;
+void Figure::read(std::istream& is) {
+    is >> x >> y >> r;
 }
 
 Figure::operator double() const {
-    return calculateArea();
+    return square();
 }
 
-bool Figure::isEqual(const Figure& other) const {
-    return centerX == other.centerX && centerY == other.centerY && 
-           circumradius == other.circumradius && vertexCount == other.vertexCount;
+bool Figure::same(const Figure& other) const {
+    return x == other.x && y == other.y && 
+           r == other.r && n == other.n;
 }
 
 Figure& Figure::operator=(const Figure& other) {
     if (this != &other) {
-        centerX = other.centerX;
-        centerY = other.centerY;
-        circumradius = other.circumradius;
-        vertexCount = other.vertexCount;
+        x = other.x;
+        y = other.y;
+        r = other.r;
+        n = other.n;
     }
     return *this;
 }
 
 Figure& Figure::operator=(Figure&& other) noexcept {
     if (this != &other) {
-        centerX = std::move(other.centerX);
-        centerY = std::move(other.centerY);
-        circumradius = std::move(other.circumradius);
-        vertexCount = std::move(other.vertexCount);
+        x = std::move(other.x);
+        y = std::move(other.y);
+        r = std::move(other.r);
+        n = std::move(other.n);
     }
     return *this;
 }
 
-
 std::ostream& operator<<(std::ostream& os, const Figure& fig) {
-    fig.outputVertices(os);
-    auto center = fig.getGeometricCenter();
-    os << "Геометрический центр: (" << center.first << ", " << center.second << ")" << std::endl;
-    os << "Площадь: " << fig.calculateArea() << std::endl;
+    fig.showPoints(os);
+    auto c = fig.center();
+    os << "Центр: (" << c.first << ", " << c.second << ")" << std::endl;
+    os << "Площадь: " << fig.square() << std::endl;
     return os;
 }
 
 std::istream& operator>>(std::istream& is, Figure& fig) {
-    fig.inputData(is);
+    fig.read(is);
     return is;
 }
 
-
-Pentagon::Pentagon(double x, double y, double radius) 
-    : Figure(x, y, radius, 5) {}
+Pentagon::Pentagon(double x, double y, double r) 
+    : Figure(x, y, r, 5) {}
 
 Pentagon::Pentagon(const Pentagon& other) 
     : Figure(other) {}
 
-Figure* Pentagon::createCopy() const {
+Figure* Pentagon::copy() const {
     return new Pentagon(*this);
 }
 
-Hexagon::Hexagon(double x, double y, double radius) 
-    : Figure(x, y, radius, 6) {}
+Hexagon::Hexagon(double x, double y, double r) 
+    : Figure(x, y, r, 6) {}
 
 Hexagon::Hexagon(const Hexagon& other) 
     : Figure(other) {}
 
-Figure* Hexagon::createCopy() const {
+Figure* Hexagon::copy() const {
     return new Hexagon(*this);
 }
-Octagon::Octagon(double x, double y, double radius) 
-    : Figure(x, y, radius, 8) {}
+
+Octagon::Octagon(double x, double y, double r) 
+    : Figure(x, y, r, 8) {}
 
 Octagon::Octagon(const Octagon& other) 
     : Figure(other) {}
 
-Figure* Octagon::createCopy() const {
+Figure* Octagon::copy() const {
     return new Octagon(*this);
 }
 
-
-
-
-FigureCollection::FigureCollection(const FigureCollection& other) {
-    for (const auto figurePtr : other.figuresList) {
-        figuresList.push_back(figurePtr->createCopy());
+FigureList::FigureList(const FigureList& other) {
+    for (const auto f : other.items) {
+        items.push_back(f->copy());
     }
 }
 
-
-FigureCollection::FigureCollection(FigureCollection&& other) noexcept 
-    : figuresList(std::move(other.figuresList)) {
-    other.figuresList.clear();
+FigureList::FigureList(FigureList&& other) noexcept 
+    : items(std::move(other.items)) {
+    other.items.clear();
 }
 
-
-FigureCollection::~FigureCollection() {
-    for (auto figurePtr : figuresList) {
-        delete figurePtr;
+FigureList::~FigureList() {
+    for (auto f : items) {
+        delete f;
     }
 }
 
-
-FigureCollection& FigureCollection::operator=(const FigureCollection& other) {
+FigureList& FigureList::operator=(const FigureList& other) {
     if (this != &other) {
-        for (auto figurePtr : figuresList) {
-            delete figurePtr;
+        for (auto f : items) {
+            delete f;
         }
-        figuresList.clear();
+        items.clear();
         
-
-        for (const auto figurePtr : other.figuresList) {
-            figuresList.push_back(figurePtr->createCopy());
+        for (const auto f : other.items) {
+            items.push_back(f->copy());
         }
     }
     return *this;
 }
 
-
-FigureCollection& FigureCollection::operator=(FigureCollection&& other) noexcept {
+FigureList& FigureList::operator=(FigureList&& other) noexcept {
     if (this != &other) {
-        for (auto figurePtr : figuresList) {
-            delete figurePtr;
+        for (auto f : items) {
+            delete f;
         }
         
-        figuresList = std::move(other.figuresList);
-        other.figuresList.clear();
+        items = std::move(other.items);
+        other.items.clear();
     }
     return *this;
 }
 
-void FigureCollection::addFigure(Figure* newFigure) {
-    figuresList.push_back(newFigure);
+void FigureList::add(Figure* fig) {
+    items.push_back(fig);
 }
 
-
-void FigureCollection::removeFigureAt(int index) {
-    if (index >= 0 && index < static_cast<int>(figuresList.size())) {
-        delete figuresList[index];
-        figuresList.erase(figuresList.begin() + index);
+void FigureList::remove(int i) {
+    if (i >= 0 && i < static_cast<int>(items.size())) {
+        delete items[i];
+        items.erase(items.begin() + i);
     }
 }
 
-
-void FigureCollection::displayAllFigures() const {
-    for (size_t i = 0; i < figuresList.size(); ++i) {
+void FigureList::showAll() const {
+    for (size_t i = 0; i < items.size(); ++i) {
         std::cout << "Фигура " << i + 1 << ":" << std::endl;
-        std::cout << *figuresList[i] << std::endl;
+        std::cout << *items[i] << std::endl;
     }
 }
 
-double FigureCollection::computeTotalArea() const {
-    double total = 0;
-    for (const auto figurePtr : figuresList) {
-        total += figurePtr->calculateArea();
+double FigureList::allSquare() const {
+    double sum = 0;
+    for (const auto f : items) {
+        sum += f->square();
     }
-    return total;
+    return sum;
 }
 
-
-void FigureCollection::displayAllCenters() const {
-    for (size_t i = 0; i < figuresList.size(); ++i) {
-        auto center = figuresList[i]->getGeometricCenter();
-        std::cout << "Центр фигуры " << i + 1 << ": (" 
-                  << center.first << ", " << center.second << ")" << std::endl;
-    }
-}
-
-
-void FigureCollection::displayAllAreas() const {
-    for (size_t i = 0; i < figuresList.size(); ++i) {
-        std::cout << "Площадь фигуры " << i + 1 << ": " 
-                  << figuresList[i]->calculateArea() << std::endl;
+void FigureList::showCenters() const {
+    for (size_t i = 0; i < items.size(); ++i) {
+        auto c = items[i]->center();
+        std::cout << "Центр " << i + 1 << ": (" 
+                  << c.first << ", " << c.second << ")" << std::endl;
     }
 }
 
-
-size_t FigureCollection::getCount() const {
-    return figuresList.size();
+void FigureList::showSquares() const {
+    for (size_t i = 0; i < items.size(); ++i) {
+        std::cout << "Площадь " << i + 1 << ": " 
+                  << items[i]->square() << std::endl;
+    }
 }
-Figure* FigureCollection::getFigureAt(size_t index) const {
-    return figuresList[index];
+
+size_t FigureList::count() const {
+    return items.size();
+}
+
+Figure* FigureList::get(size_t i) const {
+    return items[i];
 }
