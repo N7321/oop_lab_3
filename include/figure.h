@@ -5,75 +5,94 @@
 #include <cmath>
 #include <vector>
 
+// Базовый класс для геометрических фигур
 class Figure {
 protected:
-    double x, y;
-    double radius;
-    int vertices;
+    double centerX, centerY;  // Более описательные имена
+    double circumradius;       // Радиус описанной окружности
+    int vertexCount;           // Количество вершин
 
 public:
+    // Конструктор с параметрами по умолчанию
     Figure(double x = 0, double y = 0, double radius = 1, int vertices = 5);
+    
+    // Конструктор копирования
     Figure(const Figure& other);
+    
+    // Виртуальный деструктор для корректного удаления наследников
     virtual ~Figure() = default;
 
-    virtual std::pair<double, double> geometricCenter() const;
-    virtual double area() const;
-    virtual void printVertices(std::ostream& os) const;
-    virtual void readData(std::istream& is);
+    // Основные операции с фигурой
+    virtual std::pair<double, double> getGeometricCenter() const;
+    virtual double calculateArea() const;
+    virtual void outputVertices(std::ostream& os) const;
+    virtual void inputData(std::istream& is);
+    
+    // Оператор приведения к double (площадь)
     virtual operator double() const;
     
-    virtual Figure* clone() const = 0;
-    virtual bool operator==(const Figure& other) const;
+    // Виртуальные методы для работы с полиморфизмом
+    virtual Figure* createCopy() const = 0;
+    virtual bool isEqual(const Figure& other) const;
 
+    // Операторы присваивания
     Figure& operator=(const Figure& other);
     Figure& operator=(Figure&& other) noexcept;
 
+    // Дружественные операторы ввода/вывода
     friend std::ostream& operator<<(std::ostream& os, const Figure& fig);
     friend std::istream& operator>>(std::istream& is, Figure& fig);
 };
 
+// Класс правильного пятиугольника
 class Pentagon : public Figure {
 public:
     Pentagon(double x = 0, double y = 0, double radius = 1);
     Pentagon(const Pentagon& other);
-    Figure* clone() const override;
+    Figure* createCopy() const override;
 };
 
+// Класс правильного шестиугольника
 class Hexagon : public Figure {
 public:
     Hexagon(double x = 0, double y = 0, double radius = 1);
     Hexagon(const Hexagon& other);
-    Figure* clone() const override;
+    Figure* createCopy() const override;
 };
 
+// Класс правильного восьмиугольника
 class Octagon : public Figure {
 public:
     Octagon(double x = 0, double y = 0, double radius = 1);
     Octagon(const Octagon& other);
-    Figure* clone() const override;
+    Figure* createCopy() const override;
 };
 
-class FigureArray {
+// Контейнер для хранения коллекции фигур
+class FigureCollection {
 private:
-    std::vector<Figure*> figures;
+    std::vector<Figure*> figuresList;
 
 public:
-    FigureArray() = default;                                 // Конструктор по умолчанию
-    FigureArray(const FigureArray& other);                   // Copy конструктор
-    FigureArray(FigureArray&& other) noexcept;               // Move конструктор
-    ~FigureArray();
+    // Конструкторы и деструктор
+    FigureCollection() = default;
+    FigureCollection(const FigureCollection& other);
+    FigureCollection(FigureCollection&& other) noexcept;
+    ~FigureCollection();
     
-    FigureArray& operator=(const FigureArray& other);        // Copy присваивание
-    FigureArray& operator=(FigureArray&& other) noexcept;    // Move присваивание
+    // Операторы присваивания
+    FigureCollection& operator=(const FigureCollection& other);
+    FigureCollection& operator=(FigureCollection&& other) noexcept;
 
-    void addFigure(Figure* fig);
-    void removeFigure(int index);
-    void printAll() const;
-    double totalArea() const;
-    void printAllCenters() const;
-    void printAllAreas() const;
-    size_t size() const;
-    Figure* operator[](size_t index) const;
+    // Методы для работы с коллекцией
+    void addFigure(Figure* newFigure);
+    void removeFigureAt(int index);
+    void displayAllFigures() const;
+    double computeTotalArea() const;
+    void displayAllCenters() const;
+    void displayAllAreas() const;
+    size_t getCount() const;
+    Figure* getFigureAt(size_t index) const;
 };
 
 #endif

@@ -1,218 +1,222 @@
 #include "../include/figure.h"
 #include <utility>
 
-// Реализация Figure
+// Реализация базового класса Figure
 Figure::Figure(double x, double y, double radius, int vertices)
-    : x(x), y(y), radius(radius), vertices(vertices) {}
+    : centerX(x), centerY(y), circumradius(radius), vertexCount(vertices) {}
 
 Figure::Figure(const Figure& other)
-    : x(other.x), y(other.y), radius(other.radius), vertices(other.vertices) {}
+    : centerX(other.centerX), centerY(other.centerY), 
+      circumradius(other.circumradius), vertexCount(other.vertexCount) {}
 
-std::pair<double, double> Figure::geometricCenter() const {
-    return {x, y};
+std::pair<double, double> Figure::getGeometricCenter() const {
+    return {centerX, centerY};
 }
 
-double Figure::area() const {
-    double angle = 2 * M_PI / vertices;
-    return 0.5 * vertices * radius * radius * sin(angle);
+double Figure::calculateArea() const {
+    double angleStep = 2 * M_PI / vertexCount;
+    return 0.5 * vertexCount * circumradius * circumradius * sin(angleStep);
 }
 
-void Figure::printVertices(std::ostream& os) const {
-    double angle = 2 * M_PI / vertices;
-    os << "Вершины " << vertices << "-угольника: ";
-    for (int i = 0; i < vertices; ++i) {
-        double currentAngle = i * angle;
-        double vx = x + radius * cos(currentAngle);
-        double vy = y + radius * sin(currentAngle);
-        os << "(" << vx << ", " << vy << ") ";
+void Figure::outputVertices(std::ostream& os) const {
+    double angleStep = 2 * M_PI / vertexCount;
+    os << "Вершины " << vertexCount << "-угольника: ";
+    for (int i = 0; i < vertexCount; ++i) {
+        double currentAngle = i * angleStep;
+        double vertexX = centerX + circumradius * cos(currentAngle);
+        double vertexY = centerY + circumradius * sin(currentAngle);
+        os << "(" << vertexX << ", " << vertexY << ") ";
     }
     os << std::endl;
 }
 
-void Figure::readData(std::istream& is) {
-    is >> x >> y >> radius;
+void Figure::inputData(std::istream& is) {
+    is >> centerX >> centerY >> circumradius;
 }
 
 Figure::operator double() const {
-    return area();
+    return calculateArea();
 }
 
-bool Figure::operator==(const Figure& other) const {
-    return x == other.x && y == other.y && 
-           radius == other.radius && vertices == other.vertices;
+bool Figure::isEqual(const Figure& other) const {
+    return centerX == other.centerX && centerY == other.centerY && 
+           circumradius == other.circumradius && vertexCount == other.vertexCount;
 }
 
 Figure& Figure::operator=(const Figure& other) {
     if (this != &other) {
-        x = other.x;
-        y = other.y;
-        radius = other.radius;
-        vertices = other.vertices;
+        centerX = other.centerX;
+        centerY = other.centerY;
+        circumradius = other.circumradius;
+        vertexCount = other.vertexCount;
     }
     return *this;
 }
 
 Figure& Figure::operator=(Figure&& other) noexcept {
     if (this != &other) {
-        x = std::move(other.x);
-        y = std::move(other.y);
-        radius = std::move(other.radius);
-        vertices = std::move(other.vertices);
+        centerX = std::move(other.centerX);
+        centerY = std::move(other.centerY);
+        circumradius = std::move(other.circumradius);
+        vertexCount = std::move(other.vertexCount);
     }
     return *this;
 }
 
-// Реализация операторов ввода/вывода
+// Реализация операторов ввода и вывода
 std::ostream& operator<<(std::ostream& os, const Figure& fig) {
-    fig.printVertices(os);
-    auto center = fig.geometricCenter();
+    fig.outputVertices(os);
+    auto center = fig.getGeometricCenter();
     os << "Геометрический центр: (" << center.first << ", " << center.second << ")" << std::endl;
-    os << "Площадь: " << fig.area() << std::endl;
+    os << "Площадь: " << fig.calculateArea() << std::endl;
     return os;
 }
 
 std::istream& operator>>(std::istream& is, Figure& fig) {
-    fig.readData(is);
+    fig.inputData(is);
     return is;
 }
 
-// Реализация Pentagon
+// Реализация класса Pentagon
 Pentagon::Pentagon(double x, double y, double radius) 
     : Figure(x, y, radius, 5) {}
 
 Pentagon::Pentagon(const Pentagon& other) 
     : Figure(other) {}
 
-Figure* Pentagon::clone() const {
+Figure* Pentagon::createCopy() const {
     return new Pentagon(*this);
 }
 
-// Реализация Hexagon
+// Реализация класса Hexagon
 Hexagon::Hexagon(double x, double y, double radius) 
     : Figure(x, y, radius, 6) {}
 
 Hexagon::Hexagon(const Hexagon& other) 
     : Figure(other) {}
 
-Figure* Hexagon::clone() const {
+Figure* Hexagon::createCopy() const {
     return new Hexagon(*this);
 }
 
-// Реализация Octagon
+// Реализация класса Octagon
 Octagon::Octagon(double x, double y, double radius) 
     : Figure(x, y, radius, 8) {}
 
 Octagon::Octagon(const Octagon& other) 
     : Figure(other) {}
 
-Figure* Octagon::clone() const {
+Figure* Octagon::createCopy() const {
     return new Octagon(*this);
 }
 
-// Реализация FigureArray
-// Реализация FigureArray
+// Реализация класса FigureCollection
 
-// Конструктор по умолчанию (уже неявно создается)
-// FigureArray::FigureArray() = default;
-
-// Copy конструктор
-FigureArray::FigureArray(const FigureArray& other) {
-    for (const auto fig : other.figures) {
-        figures.push_back(fig->clone());  // Глубокое копирование
+// Конструктор копирования
+FigureCollection::FigureCollection(const FigureCollection& other) {
+    for (const auto figurePtr : other.figuresList) {
+        figuresList.push_back(figurePtr->createCopy());
     }
 }
 
-// Move конструктор
-FigureArray::FigureArray(FigureArray&& other) noexcept 
-    : figures(std::move(other.figures)) {  // Перемещаем вектор
-    other.figures.clear();  // Очищаем исходный вектор
+// Конструктор перемещения
+FigureCollection::FigureCollection(FigureCollection&& other) noexcept 
+    : figuresList(std::move(other.figuresList)) {
+    other.figuresList.clear();
 }
 
 // Деструктор
-FigureArray::~FigureArray() {
-    for (auto fig : figures) {
-        delete fig;
+FigureCollection::~FigureCollection() {
+    for (auto figurePtr : figuresList) {
+        delete figurePtr;
     }
 }
 
-// Copy присваивание
-FigureArray& FigureArray::operator=(const FigureArray& other) {
+// Оператор присваивания копированием
+FigureCollection& FigureCollection::operator=(const FigureCollection& other) {
     if (this != &other) {
         // Очищаем текущие данные
-        for (auto fig : figures) {
-            delete fig;
+        for (auto figurePtr : figuresList) {
+            delete figurePtr;
         }
-        figures.clear();
+        figuresList.clear();
         
-        // Копируем новые данные
-        for (const auto fig : other.figures) {
-            figures.push_back(fig->clone());
+        // Копируем данные из другого объекта
+        for (const auto figurePtr : other.figuresList) {
+            figuresList.push_back(figurePtr->createCopy());
         }
     }
     return *this;
 }
 
-// Move присваивание
-FigureArray& FigureArray::operator=(FigureArray&& other) noexcept {
+// Оператор присваивания перемещением
+FigureCollection& FigureCollection::operator=(FigureCollection&& other) noexcept {
     if (this != &other) {
         // Очищаем текущие данные
-        for (auto fig : figures) {
-            delete fig;
+        for (auto figurePtr : figuresList) {
+            delete figurePtr;
         }
         
-        // Перемещаем данные из other
-        figures = std::move(other.figures);
-        other.figures.clear();
+        // Перемещаем данные из другого объекта
+        figuresList = std::move(other.figuresList);
+        other.figuresList.clear();
     }
     return *this;
 }
 
-// Остальные методы остаются без изменений
-void FigureArray::addFigure(Figure* fig) {
-    figures.push_back(fig);
+// Добавление новой фигуры в коллекцию
+void FigureCollection::addFigure(Figure* newFigure) {
+    figuresList.push_back(newFigure);
 }
 
-void FigureArray::removeFigure(int index) {
-    if (index >= 0 && index < static_cast<int>(figures.size())) {
-        delete figures[index];
-        figures.erase(figures.begin() + index);
+// Удаление фигуры по индексу
+void FigureCollection::removeFigureAt(int index) {
+    if (index >= 0 && index < static_cast<int>(figuresList.size())) {
+        delete figuresList[index];
+        figuresList.erase(figuresList.begin() + index);
     }
 }
 
-void FigureArray::printAll() const {
-    for (size_t i = 0; i < figures.size(); ++i) {
+// Вывод информации о всех фигурах
+void FigureCollection::displayAllFigures() const {
+    for (size_t i = 0; i < figuresList.size(); ++i) {
         std::cout << "Фигура " << i + 1 << ":" << std::endl;
-        std::cout << *figures[i] << std::endl;
+        std::cout << *figuresList[i] << std::endl;
     }
 }
 
-double FigureArray::totalArea() const {
+// Вычисление общей площади всех фигур
+double FigureCollection::computeTotalArea() const {
     double total = 0;
-    for (const auto fig : figures) {
-        total += fig->area();
+    for (const auto figurePtr : figuresList) {
+        total += figurePtr->calculateArea();
     }
     return total;
 }
 
-void FigureArray::printAllCenters() const {
-    for (size_t i = 0; i < figures.size(); ++i) {
-        auto center = figures[i]->geometricCenter();
+// Вывод центров всех фигур
+void FigureCollection::displayAllCenters() const {
+    for (size_t i = 0; i < figuresList.size(); ++i) {
+        auto center = figuresList[i]->getGeometricCenter();
         std::cout << "Центр фигуры " << i + 1 << ": (" 
                   << center.first << ", " << center.second << ")" << std::endl;
     }
 }
 
-void FigureArray::printAllAreas() const {
-    for (size_t i = 0; i < figures.size(); ++i) {
+// Вывод площадей всех фигур
+void FigureCollection::displayAllAreas() const {
+    for (size_t i = 0; i < figuresList.size(); ++i) {
         std::cout << "Площадь фигуры " << i + 1 << ": " 
-                  << figures[i]->area() << std::endl;
+                  << figuresList[i]->calculateArea() << std::endl;
     }
 }
 
-size_t FigureArray::size() const {
-    return figures.size();
+// Получение количества фигур в коллекции
+size_t FigureCollection::getCount() const {
+    return figuresList.size();
 }
 
-Figure* FigureArray::operator[](size_t index) const {
-    return figures[index];
+// Доступ к фигуре по индексу
+Figure* FigureCollection::getFigureAt(size_t index) const {
+    return figuresList[index];
 }
